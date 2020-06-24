@@ -1,0 +1,36 @@
+version: '3'
+services:
+
+  server:
+    build: server
+    ports:
+      - 50051:50051
+    networks:
+      - envoymesh
+
+  client:
+    build: client
+    depends_on:
+      - server
+      - proxy
+    ports:
+      - 80:80
+    networks:
+      - envoymesh
+    volumes:
+      - ./client:/usr/src/app:rw
+
+  proxy:
+    image: envoyproxy/envoy-alpine
+    environment:
+      NODE_ENV: development
+    ports:
+      - 8080:8080
+      - 8081:8081
+    networks:
+      - envoymesh
+    volumes:
+      - ./envoy.yaml:/etc/envoy/envoy.yaml
+
+networks:
+  envoymesh: {}
